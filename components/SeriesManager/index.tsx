@@ -26,13 +26,34 @@ interface SeriesManagerProps {
 
 // --- Reusable Sub-components ---
 
-const ActionButton = ({ icon: Icon, label, disabled = false, count = 0 }: { icon: any, label: string, disabled?: boolean, count?: number }) => (
+const ActionButton = ({ 
+  icon: Icon, 
+  label, 
+  disabled = false, 
+  count = 0,
+  onClick,
+  isActive = false
+}: { 
+  icon: any, 
+  label: string, 
+  disabled?: boolean, 
+  count?: number,
+  onClick?: () => void,
+  isActive?: boolean
+}) => (
   <button 
+    onClick={onClick}
     disabled={disabled}
-    className="flex items-center gap-2 px-5 py-3 border border-[var(--border-primary)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:border-[var(--border-secondary)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+    className={`flex items-center gap-2 px-5 py-3 border transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+      isActive 
+        ? 'border-[var(--accent)] text-[var(--accent-text)] bg-[var(--accent-bg)]' 
+        : 'border-[var(--border-primary)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:border-[var(--border-secondary)]'
+    }`}
   >
-    <Icon className="w-4 h-4" />
-    <span className="text-xs font-bold uppercase tracking-widest">{label} {count > 0 && `(${count})`}</span>
+    <Icon className={`w-4 h-4 ${isActive ? 'text-[var(--accent)]' : ''}`} />
+    <span className="text-xs font-bold uppercase tracking-widest">
+      {label} {count > 0 && `(${count})`}
+    </span>
   </button>
 );
 
@@ -61,6 +82,7 @@ export default function SeriesManager({ project, updateProject, onEnterEpisode, 
   const [isCreatingSeason, setIsCreatingSeason] = useState(false);
   const [newSeasonTitle, setNewSeasonTitle] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploadMode, setIsUploadMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [expandedSeasons, setExpandedSeasons] = useState<string[]>(
     project.seriesData?.seasons.length ? [project.seriesData.seasons[0].id] : []
@@ -287,6 +309,12 @@ export default function SeriesManager({ project, updateProject, onEnterEpisode, 
               </div>
               
               <div className="flex flex-wrap gap-3">
+                <ActionButton 
+                  icon={UploadCloud} 
+                  label={isUploadMode ? "上传模式" : "普通模式"} 
+                  isActive={isUploadMode}
+                  onClick={() => setIsUploadMode(!isUploadMode)}
+                />
                 <ActionButton icon={Users} label="角色库" count={sharedAssets.characters.length} />
                 <ActionButton icon={MapPin} label="场景库" count={sharedAssets.scenes.length} />
                 <ActionButton icon={Package} label="道具库" count={sharedAssets.props.length} />
