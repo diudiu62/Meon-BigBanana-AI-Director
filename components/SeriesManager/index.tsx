@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   ChevronLeft, 
   FolderOpen, 
@@ -12,7 +12,8 @@ import {
   Plus, 
   Trash2,
   CircleAlert,
-  X
+  X,
+  UploadCloud
 } from 'lucide-react';
 import { ProjectState, Season, Episode } from '../../types';
 
@@ -59,6 +60,8 @@ export default function SeriesManager({ project, updateProject, onEnterEpisode, 
   const [isEditingProjectName, setIsEditingProjectName] = useState(false);
   const [isCreatingSeason, setIsCreatingSeason] = useState(false);
   const [newSeasonTitle, setNewSeasonTitle] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [expandedSeasons, setExpandedSeasons] = useState<string[]>(
     project.seriesData?.seasons.length ? [project.seriesData.seasons[0].id] : []
   );
@@ -198,6 +201,49 @@ export default function SeriesManager({ project, updateProject, onEnterEpisode, 
 
   const totalEpisodes = seasons.reduce((sum, season) => sum + season.episodes.length, 0);
 
+  // 处理文件上传
+  const handleFileUpload = async (file: File) => {
+    const validExtensions = ['.docx', '.md', '.txt', '.doc'];
+    const fileName = file.name.toLowerCase();
+    const isValid = validExtensions.some(ext => fileName.endsWith(ext));
+
+    if (!isValid) {
+      alert(`不支持的文件类型。请上传以下格式的文件：${validExtensions.join(', ')}`);
+      return;
+    }
+
+    // 仅保留文件接收逻辑，等待后续具体导入方案
+    console.log("已接收文件准备导入:", file.name);
+    alert(`成功接收文件：${file.name}\n(导入逻辑待实现...)`);
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFileUpload(e.target.files[0]);
+      // 重置input，以便能够重复上传同一个文件
+      e.target.value = '';
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-secondary)] p-8 md:p-12 font-sans">
@@ -284,6 +330,42 @@ export default function SeriesManager({ project, updateProject, onEnterEpisode, 
                 title="点击第一集开始创作" 
                 desc="点击「第1集」进入剧本阶段开始创作。" 
               />
+            </div>
+          </section>
+
+          {/* Upload Section */}
+          <section className="mb-8">
+            <div 
+              className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer ${
+                isDragging 
+                  ? 'border-[var(--accent)] bg-[var(--accent-bg)]' 
+                  : 'border-[var(--border-secondary)] hover:border-[var(--accent-border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)]'
+              }`}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input 
+                type="file" 
+                ref={fileInputRef}
+                className="hidden" 
+                accept=".docx,.md,.txt,.doc"
+                onChange={handleFileInputChange}
+              />
+              <div className="flex flex-col items-center justify-center gap-3">
+                <div className={`p-3 rounded-full ${isDragging ? 'bg-[var(--accent)] text-[var(--text-primary)]' : 'bg-[var(--bg-elevated)] text-[var(--text-muted)]'}`}>
+                  <UploadCloud className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[var(--text-primary)] mb-1">
+                    点击上传或拖拽文件到此处
+                  </p>
+                  <p className="text-xs text-[var(--text-tertiary)]">
+                    支持导入 .docx, .doc, .txt, .md 格式的剧本文档
+                  </p>
+                </div>
+              </div>
             </div>
           </section>
 
