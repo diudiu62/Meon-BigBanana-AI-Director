@@ -184,10 +184,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentStage, setStage, onExit, proje
       {/* Footer */}
       <div className="p-6 border-t border-[var(--border-subtle)] space-y-4">
         {/* 剩余积分模块 */}
-        <div className="flex items-center justify-between text-[var(--text-muted)] group">
-          <div className="flex items-center gap-2 flex-1">
+        <div className="w-full flex items-center justify-between text-[var(--text-muted)] group">
+          <div className="flex items-center gap-2">
             <span className="font-mono text-[10px] uppercase tracking-widest cursor-default">剩余积分</span>
-            <div className="flex items-center gap-1.5 flex-1">
+            <div className="flex items-center gap-1">
               {pointsInfo ? (
                 <span className="text-xs font-bold text-[var(--text-primary)] font-mono">{pointsInfo.totalCredit}</span>
               ) : (
@@ -206,10 +206,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentStage, setStage, onExit, proje
           {pointsInfo && (
             <button
               onClick={() => setShowPointsModal(true)}
-              className="p-1 hover:bg-[var(--bg-hover)] rounded text-[var(--text-tertiary)] hover:text-[var(--accent-text)] transition-colors"
+              className="p-0.5 hover:bg-[var(--bg-hover)] rounded text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
               title="查看积分详情"
             >
-              <Info className="w-3.5 h-3.5" />
+              <Info className="w-4 h-4" />
             </button>
           )}
         </div>
