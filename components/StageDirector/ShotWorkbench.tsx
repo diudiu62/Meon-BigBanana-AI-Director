@@ -102,7 +102,8 @@ const ShotWorkbench: React.FC<ShotWorkbenchProps> = ({
   }, [currentVideoModelId]);
 
   const normalizedModelId = localVideoModelId.trim().toLowerCase();
-  const showEndFrame = normalizedModelId.startsWith('veo');
+  // 强制显示结束帧，方便用户做分镜规划，即使当前视频模型不支持首尾帧生成
+  const showEndFrame = true; // normalizedModelId.startsWith('veo');
   
   // 从shot.id中提取显示编号
   const getShotDisplayNumber = () => {

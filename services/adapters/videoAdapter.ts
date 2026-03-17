@@ -260,7 +260,9 @@ const callSoraApi = async (
   const useReferenceArray = resolvedModel.toLowerCase().startsWith('veo_3_1-fast');
 
   if (resolvedModel === 'sora-2' && references.length >= 2) {
-    throw new Error('Sora-2 不支持首尾帧模式，请只传一张参考图。');
+    console.warn('⚠️ Sora-2 不支持首尾帧模式，将忽略结束帧，仅使用起始帧生成。');
+    // 保留第一个作为起始帧，忽略后续的
+    references.length = 1;
   }
   
   const { width, height, size } = getSizeFromAspectRatio(aspectRatio);

@@ -53,7 +53,12 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({
   
   // 当前选中的模型
   const selectedModel = videoModels.find(m => m.id === selectedModelId) as VideoModelDefinition | undefined;
-  const modelType: 'sora' | 'veo' = selectedModel?.params.mode === 'async' ? 'sora' : 'veo';
+  
+  // 识别模型类型
+  const modelType: 'sora' | 'jimeng' | 'veo' = 
+    selectedModel?.params.mode === 'async' ? 'sora' : 
+    (selectedModel?.params.mode === 'jimeng' ? 'jimeng' : 'veo');
+    
   const effectiveModelId = selectedModelId === 'veo_3_1-fast'
     ? (veoFastQuality === '4k' ? 'veo_3_1-fast-4K' : 'veo_3_1-fast')
     : selectedModelId;
@@ -231,7 +236,9 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({
         {isGenerating ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            {`生成视频中 (${aspectRatio}, ${modelType === 'sora' ? `${duration}秒` : selectedModel?.name})...`}
+            {`生成视频中 (${aspectRatio}, ${
+              modelType === 'sora' || modelType === 'jimeng' ? `${duration}秒` : selectedModel?.name
+            })...`}
           </>
         ) : (
           <>{hasVideo ? '重新生成视频' : '开始生成视频'}</>
@@ -242,6 +249,12 @@ const VideoGenerator: React.FC<VideoGeneratorProps> = ({
       {!hasEndFrame && (
         <div className="text-[9px] text-[var(--text-tertiary)] text-center font-mono">
           * 未检测到结束帧，将使用单图生成模式 (Image-to-Video)
+        </div>
+      )}
+      
+      {hasEndFrame && modelType === 'sora' && (
+        <div className="text-[9px] text-[var(--warning-text)] text-center font-mono">
+          * Sora-2 模型不支持首尾帧控制，将忽略结束帧仅使用起始帧
         </div>
       )}
     </div>
