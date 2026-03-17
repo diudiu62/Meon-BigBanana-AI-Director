@@ -217,7 +217,8 @@ const StageDirector: React.FC<Props> = ({ project, updateProject, onApiKeyError,
     }
     
     try {
-      const refResult = getRefImagesForShot(shot, project.scriptData);
+      // 传递当前生成的帧类型（start/end），以便在生成结束帧时自动引用起始帧
+      const refResult = getRefImagesForShot(shot, project.scriptData, type);
       // 使用当前设置的横竖屏比例生成关键帧，传递 hasTurnaround 标记
       const url = await generateImage(prompt, refResult.images, keyframeAspectRatio, false, refResult.hasTurnaround);
 

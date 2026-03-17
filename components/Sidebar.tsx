@@ -1,7 +1,8 @@
-import React from 'react';
-import { FileText, Users, Clapperboard, Film, ChevronLeft, ListTree, HelpCircle, Cpu, Sun, Moon, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { FileText, Users, Clapperboard, Film, ChevronLeft, ListTree, HelpCircle, Cpu, Sun, Moon, Loader2, RefreshCw, Info, X } from 'lucide-react';
 import logoImg from '../meon_logo.svg';
 import { useTheme } from '../contexts/ThemeContext';
+import { getJimengGlobalConfig } from '../services/modelRegistry';
 
 interface SidebarProps {
   currentStage: string;
@@ -51,6 +52,50 @@ const Sidebar: React.FC<SidebarProps> = ({ currentStage, setStage, onExit, proje
   // The user request says "In the project location that has not been upgraded to the new classification".
   // This implies we should show it when the project is NOT a series.
   
+  const [pointsInfo, setPointsInfo] = useState<{
+    giftCredit: number;
+    purchaseCredit: number;
+    vipCredit: number;
+    totalCredit: number;
+  } | null>(null);
+  const [isLoadingPoints, setIsLoadingPoints] = useState(false);
+  const [showPointsModal, setShowPointsModal] = useState(false);
+
+  const handleFetchPoints = async () => {
+    setIsLoadingPoints(true);
+    try {
+      const config = getJimengGlobalConfig();
+      if (!config.baseUrl || !config.sessionToken) {
+        alert('请先在系统设置中配置即梦(Jimeng)的 Base URL 和 Session Token');
+        setIsLoadingPoints(false);
+        return;
+      }
+
+      const response = await fetch(`${config.baseUrl.replace(/\/+$/, '')}/token/points`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${config.sessionToken}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`获取积分失败: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0 && data[0].points) {
+        setPointsInfo(data[0].points);
+      } else {
+        throw new Error('返回数据格式异常');
+      }
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || '获取积分失败');
+    } finally {
+      setIsLoadingPoints(false);
+    }
+  };
+
   return (
     <aside className="w-72 bg-[var(--bg-base)] border-r border-[var(--border-primary)] h-screen fixed left-0 top-0 flex flex-col z-50 select-none">
       {/* Header */}
@@ -138,6 +183,37 @@ const Sidebar: React.FC<SidebarProps> = ({ currentStage, setStage, onExit, proje
 
       {/* Footer */}
       <div className="p-6 border-t border-[var(--border-subtle)] space-y-4">
+        {/* 剩余积分模块 */}
+        <div className="flex items-center justify-between text-[var(--text-muted)] group">
+          <div className="flex items-center gap-2 flex-1">
+            <span className="font-mono text-[10px] uppercase tracking-widest cursor-default">剩余积分</span>
+            <div className="flex items-center gap-1.5 flex-1">
+              {pointsInfo ? (
+                <span className="text-xs font-bold text-[var(--text-primary)] font-mono">{pointsInfo.totalCredit}</span>
+              ) : (
+                <span className="text-[10px] text-[var(--text-tertiary)] italic">未获取</span>
+              )}
+              <button 
+                onClick={handleFetchPoints}
+                disabled={isLoadingPoints}
+                className="p-1 hover:bg-[var(--bg-hover)] rounded text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors disabled:opacity-50"
+                title="刷新积分"
+              >
+                <RefreshCw className={`w-3 h-3 ${isLoadingPoints ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+          </div>
+          {pointsInfo && (
+            <button
+              onClick={() => setShowPointsModal(true)}
+              className="p-1 hover:bg-[var(--bg-hover)] rounded text-[var(--text-tertiary)] hover:text-[var(--accent-text)] transition-colors"
+              title="查看积分详情"
+            >
+              <Info className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
         <button 
           onClick={toggleTheme}
           className="w-full flex items-center justify-between text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition-colors"
@@ -161,12 +237,49 @@ const Sidebar: React.FC<SidebarProps> = ({ currentStage, setStage, onExit, proje
             className="w-full flex items-center justify-between text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition-colors"
           >
             <span className="font-mono text-[10px] uppercase tracking-widest">模型配置</span>
-            <Cpu className="w-4 h-4" />
-          </button>
-        )}
+          <Cpu className="w-4 h-4" />
+        </button>
+      )}
+    </div>
+
+    {/* 积分详情弹窗 */}
+    {showPointsModal && pointsInfo && (
+      <div className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center backdrop-blur-sm p-4" onClick={() => setShowPointsModal(false)}>
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-primary)] rounded-xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
+          <div className="flex items-center justify-between p-4 border-b border-[var(--border-primary)] bg-[var(--bg-elevated)]">
+            <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <Info className="w-4 h-4 text-[var(--accent)]" />
+              即梦积分详情
+            </h3>
+            <button onClick={() => setShowPointsModal(false)} className="p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors rounded-md hover:bg-[var(--bg-hover)]">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="p-5 space-y-4">
+            <div className="flex justify-between items-center p-3 bg-[var(--bg-base)] rounded-lg border border-[var(--border-secondary)]">
+              <span className="text-xs text-[var(--text-secondary)] font-medium">总积分 (Total)</span>
+              <span className="text-lg font-bold text-[var(--accent)] font-mono">{pointsInfo.totalCredit}</span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[var(--text-tertiary)]">赠送积分 (Gift)</span>
+                <span className="text-[var(--text-primary)] font-mono">{pointsInfo.giftCredit}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[var(--text-tertiary)]">购买积分 (Purchase)</span>
+                <span className="text-[var(--text-primary)] font-mono">{pointsInfo.purchaseCredit}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[var(--text-tertiary)]">VIP积分 (VIP)</span>
+                <span className="text-[var(--text-primary)] font-mono">{pointsInfo.vipCredit}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </aside>
-  );
+    )}
+  </aside>
+);
 };
 
 export default Sidebar;

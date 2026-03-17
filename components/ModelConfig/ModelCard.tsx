@@ -99,24 +99,56 @@ const ModelCard: React.FC<ModelCardProps> = ({
   );
 
   const renderImageParams = (params: ImageModelParams) => (
-    <div>
-      <label className="text-[10px] text-[var(--text-tertiary)] block mb-1">默认比例</label>
-      <div className="flex gap-2">
-        {/* 从模型的 supportedAspectRatios 读取支持的比例 */}
-        {(params.supportedAspectRatios || ['16:9', '9:16']).map((ratio) => (
-          <button
-            key={ratio}
-            onClick={() => handleParamChange('defaultAspectRatio', ratio)}
-            className={`px-3 py-1.5 text-xs rounded transition-colors ${
-              editParams.defaultAspectRatio === ratio
-                ? 'bg-[var(--accent)] text-[var(--text-primary)]'
-                : 'bg-[var(--bg-hover)] text-[var(--text-tertiary)] hover:bg-[var(--border-secondary)]'
-            }`}
-          >
-{ratio === '16:9' ? '横屏' : ratio === '9:16' ? '竖屏' : ratio === '1:1' ? '方形' : ratio}
-          </button>
-        ))}
+    <div className="space-y-4">
+      <div>
+        <label className="text-[10px] text-[var(--text-tertiary)] block mb-1">默认比例</label>
+        <div className="flex gap-2">
+          {/* 从模型的 supportedAspectRatios 读取支持的比例 */}
+          {(params.supportedAspectRatios || ['16:9', '9:16']).map((ratio) => (
+            <button
+              key={ratio}
+              onClick={() => handleParamChange('defaultAspectRatio', ratio)}
+              className={`px-3 py-1.5 text-xs rounded transition-colors ${
+                editParams.defaultAspectRatio === ratio
+                  ? 'bg-[var(--accent)] text-[var(--text-primary)]'
+                  : 'bg-[var(--bg-hover)] text-[var(--text-tertiary)] hover:bg-[var(--border-secondary)]'
+              }`}
+            >
+              {ratio === '16:9' ? '横屏' : ratio === '9:16' ? '竖屏' : ratio === '1:1' ? '方形' : ratio}
+            </button>
+          ))}
+        </div>
       </div>
+      
+      {/* 针对即梦图片模型的特殊参数 */}
+      {model.providerId === 'jimeng' && (
+        <div>
+          <label className="text-[10px] text-[var(--text-tertiary)] block mb-1">
+            采样强度 (Sample Strength) - 用于图生图
+          </label>
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              min="0"
+              max="1"
+              step="0.05"
+              value={editParams.sampleStrength ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleParamChange('sampleStrength', value === '' ? undefined : parseFloat(value));
+              }}
+              placeholder="留空由服务端决定"
+              className="w-full bg-[var(--bg-hover)] border border-[var(--border-secondary)] rounded px-3 py-2 text-xs text-[var(--text-primary)]"
+            />
+            <span className="text-[10px] text-[var(--text-muted)] w-24 shrink-0">
+              0.0 ~ 1.0
+            </span>
+          </div>
+          <p className="text-[9px] text-[var(--text-muted)] mt-1">
+            影响 AI 对参考图的遵循程度。值越高，变化越大；留空则使用官方默认值。
+          </p>
+        </div>
+      )}
     </div>
   );
 

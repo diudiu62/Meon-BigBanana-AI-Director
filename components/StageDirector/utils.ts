@@ -16,12 +16,26 @@ export interface RefImagesResult {
  * 获取镜头的参考图片
  * 增强版：如果角色有九宫格造型图，将整张九宫格图作为额外参考传入，
  * 并通过 hasTurnaround 标记告知调用方，以便在提示词中正确描述。
+ * 如果生成的是结束帧（type='end'），还会尝试将起始帧作为参考图，以保持连贯性
  */
-export const getRefImagesForShot = (shot: Shot, scriptData: ProjectState['scriptData']): RefImagesResult => {
+export const getRefImagesForShot = (
+  shot: Shot, 
+  scriptData: ProjectState['scriptData'],
+  targetFrameType?: 'start' | 'end'
+): RefImagesResult => {
   const referenceImages: string[] = [];
   let hasTurnaround = false;
   
   if (!scriptData) return { images: referenceImages, hasTurnaround };
+
+  // 0. 如果是生成结束帧，且起始帧已生成，将其作为首选参考图
+  // 这能极大提高镜头内的连贯性
+  if (targetFrameType === 'end') {
+    const startKf = shot.keyframes?.find(k => k.type === 'start');
+    if (startKf?.imageUrl) {
+      referenceImages.push(startKf.imageUrl);
+    }
+  }
   
   // 1. 场景参考图（环境/氛围） - 优先级最高
   const scene = scriptData.scenes.find(s => String(s.id) === String(shot.sceneId));
