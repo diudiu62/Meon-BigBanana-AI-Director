@@ -402,149 +402,153 @@ export default function SeriesManager({ project, updateProject, onEnterEpisode, 
           )}
 
           {/* Season Management Section */}
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">剧集管理</h2>
-            <button 
-              onClick={() => setIsCreatingSeason(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors text-xs font-bold uppercase tracking-widest"
-            >
-              <Plus className="w-4 h-4" />
-              新建剧集
-            </button>
-          </div>
-
-          {/* Season List */}
-          <div className="space-y-4">
-            
-            {/* New Season Input Form */}
-            {isCreatingSeason && (
-              <div className="mb-6 flex items-center gap-3 bg-[var(--bg-primary)] border border-[var(--border-primary)] p-4">
-                <input 
-                  placeholder="输入剧集名称，如“第二季”" 
-                  className="flex-1 bg-transparent border-b border-[var(--border-secondary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none py-1" 
-                  value={newSeasonTitle}
-                  onChange={(e) => setNewSeasonTitle(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCreateSeason()}
-                  autoFocus
-                />
+          {!isUploadMode && (
+            <>
+              <div className="mb-8 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">剧集管理</h2>
                 <button 
-                  onClick={handleCreateSeason}
-                  className="px-4 py-2 bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] text-xs font-bold uppercase tracking-widest"
+                  onClick={() => setIsCreatingSeason(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors text-xs font-bold uppercase tracking-widest"
                 >
-                  创建
-                </button>
-                <button 
-                  onClick={() => {
-                    setIsCreatingSeason(false);
-                    setNewSeasonTitle("");
-                  }}
-                  className="px-4 py-2 text-[var(--text-muted)] text-xs hover:text-[var(--text-primary)] transition-colors"
-                >
-                  取消
+                  <Plus className="w-4 h-4" />
+                  新建剧集
                 </button>
               </div>
-            )}
 
-            {/* Dynamic Seasons List */}
-            {seasons.map((season) => {
-              const isExpanded = expandedSeasons.includes(season.id);
-              
-              return (
-                <div key={season.id} className="bg-[var(--bg-primary)] border border-[var(--border-primary)] overflow-hidden">
-                  <div 
-                    className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-[var(--bg-secondary)] transition-colors"
-                    onClick={() => toggleExpand(season.id)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <ChevronRight className={`w-4 h-4 text-[var(--text-muted)] transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-                      <Film className="w-5 h-5 text-[var(--text-tertiary)]" />
-                      <span className="text-sm font-bold text-[var(--text-primary)]">{season.title}</span>
-                      <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">{season.episodes.length} 集</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button 
-                        className="p-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors rounded" 
-                        title="添加新集"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddEpisode(season.id);
-                          if (!isExpanded) toggleExpand(season.id);
-                        }}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                      <button 
-                        className="p-2 text-[var(--text-muted)] hover:text-[var(--error-text)] hover:bg-[var(--bg-hover)] transition-colors rounded" 
-                        title="删除剧集"
-                        onClick={(e) => handleDeleteSeason(e, season)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+              {/* Season List */}
+              <div className="space-y-4">
+                
+                {/* New Season Input Form */}
+                {isCreatingSeason && (
+                  <div className="mb-6 flex items-center gap-3 bg-[var(--bg-primary)] border border-[var(--border-primary)] p-4">
+                    <input 
+                      placeholder="输入剧集名称，如“第二季”" 
+                      className="flex-1 bg-transparent border-b border-[var(--border-secondary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none py-1" 
+                      value={newSeasonTitle}
+                      onChange={(e) => setNewSeasonTitle(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleCreateSeason()}
+                      autoFocus
+                    />
+                    <button 
+                      onClick={handleCreateSeason}
+                      className="px-4 py-2 bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] text-xs font-bold uppercase tracking-widest"
+                    >
+                      创建
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setIsCreatingSeason(false);
+                        setNewSeasonTitle("");
+                      }}
+                      className="px-4 py-2 text-[var(--text-muted)] text-xs hover:text-[var(--text-primary)] transition-colors"
+                    >
+                      取消
+                    </button>
                   </div>
+                )}
 
-                  {/* Episodes List (Expanded State) */}
-                  {isExpanded && (
-                    <div className="border-t border-[var(--border-subtle)]">
-                      {season.episodes.length === 0 ? (
-                        <div className="px-6 py-8 text-center text-[var(--text-muted)] text-xs">
-                          暂无集数
+                {/* Dynamic Seasons List */}
+                {seasons.map((season) => {
+                  const isExpanded = expandedSeasons.includes(season.id);
+                  
+                  return (
+                    <div key={season.id} className="bg-[var(--bg-primary)] border border-[var(--border-primary)] overflow-hidden">
+                      <div 
+                        className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-[var(--bg-secondary)] transition-colors"
+                        onClick={() => toggleExpand(season.id)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <ChevronRight className={`w-4 h-4 text-[var(--text-muted)] transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                          <Film className="w-5 h-5 text-[var(--text-tertiary)]" />
+                          <span className="text-sm font-bold text-[var(--text-primary)]">{season.title}</span>
+                          <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">{season.episodes.length} 集</span>
+                        </div>
+                        <div className="flex items-center gap-2">
                           <button 
-                            onClick={() => handleAddEpisode(season.id)}
-                            className="ml-2 text-[var(--accent-text)] hover:underline"
+                            className="p-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors rounded" 
+                            title="添加新集"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddEpisode(season.id);
+                              if (!isExpanded) toggleExpand(season.id);
+                            }}
                           >
-                            创建第一集
+                            <Plus className="w-4 h-4" />
+                          </button>
+                          <button 
+                            className="p-2 text-[var(--text-muted)] hover:text-[var(--error-text)] hover:bg-[var(--bg-hover)] transition-colors rounded" 
+                            title="删除剧集"
+                            onClick={(e) => handleDeleteSeason(e, season)}
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                      ) : (
-                        <div>
-                          {season.episodes.map((episode, idx) => (
-                            <div key={episode.id} className="flex items-center justify-between px-6 py-3 hover:bg-[var(--bg-secondary)] transition-colors group">
+                      </div>
+
+                      {/* Episodes List (Expanded State) */}
+                      {isExpanded && (
+                        <div className="border-t border-[var(--border-subtle)]">
+                          {season.episodes.length === 0 ? (
+                            <div className="px-6 py-8 text-center text-[var(--text-muted)] text-xs">
+                              暂无集数
                               <button 
-                                className="flex items-center gap-3 flex-1 text-left"
-                                onClick={() => onEnterEpisode(episode.id)}
+                                onClick={() => handleAddEpisode(season.id)}
+                                className="ml-2 text-[var(--accent-text)] hover:underline"
                               >
-                                <span className="w-8 h-8 flex items-center justify-center bg-[var(--bg-elevated)] text-[10px] font-mono text-[var(--text-tertiary)] rounded">
-                                  {idx + 1}
-                                </span>
-                                <div>
-                                  <div className="text-sm text-[var(--text-primary)]">{episode.title}</div>
-                                  <div className="text-[10px] text-[var(--text-muted)] font-mono">
-                                    {episode.status === 'scripting' ? '剧本阶段' : episode.status === 'production' ? '制作中' : '已完成'} 
-                                    · {new Date(episode.lastModified).toLocaleDateString()}
+                                创建第一集
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              {season.episodes.map((episode, idx) => (
+                                <div key={episode.id} className="flex items-center justify-between px-6 py-3 hover:bg-[var(--bg-secondary)] transition-colors group">
+                                  <button 
+                                    className="flex items-center gap-3 flex-1 text-left"
+                                    onClick={() => onEnterEpisode(episode.id)}
+                                  >
+                                    <span className="w-8 h-8 flex items-center justify-center bg-[var(--bg-elevated)] text-[10px] font-mono text-[var(--text-tertiary)] rounded">
+                                      {idx + 1}
+                                    </span>
+                                    <div>
+                                      <div className="text-sm text-[var(--text-primary)]">{episode.title}</div>
+                                      <div className="text-[10px] text-[var(--text-muted)] font-mono">
+                                        {episode.status === 'scripting' ? '剧本阶段' : episode.status === 'production' ? '制作中' : '已完成'} 
+                                        · {new Date(episode.lastModified).toLocaleDateString()}
+                                      </div>
+                                    </div>
+                                  </button>
+                                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button 
+                                      className="p-1.5 text-[var(--text-muted)] hover:text-[var(--error-text)] transition-colors"
+                                      onClick={(e) => handleDeleteEpisode(e, season.id, episode)}
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                    <ChevronRight className="w-4 h-4 text-[var(--text-muted)]" />
                                   </div>
                                 </div>
-                              </button>
-                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button 
-                                  className="p-1.5 text-[var(--text-muted)] hover:text-[var(--error-text)] transition-colors"
-                                  onClick={(e) => handleDeleteEpisode(e, season.id, episode)}
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                                <ChevronRight className="w-4 h-4 text-[var(--text-muted)]" />
-                              </div>
+                              ))}
                             </div>
-                          ))}
+                          )}
+                          
+                          {/* Footer Add Episode Button */}
+                          <div className="px-6 py-3 border-t border-[var(--border-subtle)] bg-[var(--bg-sunken)]">
+                            <button 
+                              onClick={() => handleAddEpisode(season.id)}
+                              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                            >
+                              <Plus className="w-3 h-3" />
+                              添加新集
+                            </button>
+                          </div>
                         </div>
                       )}
-                      
-                      {/* Footer Add Episode Button */}
-                      <div className="px-6 py-3 border-t border-[var(--border-subtle)] bg-[var(--bg-sunken)]">
-                        <button 
-                          onClick={() => handleAddEpisode(season.id)}
-                          className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                        >
-                          <Plus className="w-3 h-3" />
-                          添加新集
-                        </button>
-                      </div>
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
         </div>
       </div>
