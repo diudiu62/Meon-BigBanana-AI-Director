@@ -333,69 +333,73 @@ export default function SeriesManager({ project, updateProject, onEnterEpisode, 
           </div>
 
           {/* Guide Section */}
-          <section className="mb-8 border border-[var(--border-primary)] bg-[var(--bg-primary)] p-5 md:p-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2">新项目引导</p>
-                <h2 className="text-base font-bold text-[var(--text-primary)]">多剧集模式建议按这 3 步开始</h2>
-                <p className="text-xs text-[var(--text-tertiary)] mt-2">先创建剧集，再创建集，最后点击第一集进入创作。</p>
+          {!isUploadMode && (
+            <section className="mb-8 border border-[var(--border-primary)] bg-[var(--bg-primary)] p-5 md:p-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2">新项目引导</p>
+                  <h2 className="text-base font-bold text-[var(--text-primary)]">多剧集模式建议按这 3 步开始</h2>
+                  <p className="text-xs text-[var(--text-tertiary)] mt-2">先创建剧集，再创建集，最后点击第一集进入创作。</p>
+                </div>
               </div>
-            </div>
-            
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              <GuideStep 
-                step="Step 1" 
-                title="创建剧集" 
-                desc="已创建「第一季」，可继续添加更多剧集。" 
-              />
-              <GuideStep 
-                step="Step 2" 
-                title="为剧集创建集" 
-                desc="展开「第一季」，点击 + 添加新集。" 
-              />
-              <GuideStep 
-                step="Step 3" 
-                title="点击第一集开始创作" 
-                desc="点击「第1集」进入剧本阶段开始创作。" 
-              />
-            </div>
-          </section>
+              
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
+                <GuideStep 
+                  step="Step 1" 
+                  title="创建剧集" 
+                  desc="已创建「第一季」，可继续添加更多剧集。" 
+                />
+                <GuideStep 
+                  step="Step 2" 
+                  title="为剧集创建集" 
+                  desc="展开「第一季」，点击 + 添加新集。" 
+                />
+                <GuideStep 
+                  step="Step 3" 
+                  title="点击第一集开始创作" 
+                  desc="点击「第1集」进入剧本阶段开始创作。" 
+                />
+              </div>
+            </section>
+          )}
 
           {/* Upload Section */}
-          <section className="mb-8">
-            <div 
-              className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer ${
-                isDragging 
-                  ? 'border-[var(--accent)] bg-[var(--accent-bg)]' 
-                  : 'border-[var(--border-secondary)] hover:border-[var(--accent-border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)]'
-              }`}
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <input 
-                type="file" 
-                ref={fileInputRef}
-                className="hidden" 
-                accept=".docx,.md,.txt,.doc"
-                onChange={handleFileInputChange}
-              />
-              <div className="flex flex-col items-center justify-center gap-3">
-                <div className={`p-3 rounded-full ${isDragging ? 'bg-[var(--accent)] text-[var(--text-primary)]' : 'bg-[var(--bg-elevated)] text-[var(--text-muted)]'}`}>
-                  <UploadCloud className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-[var(--text-primary)] mb-1">
-                    点击上传或拖拽文件到此处
-                  </p>
-                  <p className="text-xs text-[var(--text-tertiary)]">
-                    支持导入 .docx, .doc, .txt, .md 格式的剧本文档
-                  </p>
+          {isUploadMode && (
+            <section className="mb-8">
+              <div 
+                className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer ${
+                  isDragging 
+                    ? 'border-[var(--accent)] bg-[var(--accent-bg)]' 
+                    : 'border-[var(--border-secondary)] hover:border-[var(--accent-border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)]'
+                }`}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input 
+                  type="file" 
+                  ref={fileInputRef}
+                  className="hidden" 
+                  accept=".docx,.md,.txt,.doc"
+                  onChange={handleFileInputChange}
+                />
+                <div className="flex flex-col items-center justify-center gap-3">
+                  <div className={`p-3 rounded-full ${isDragging ? 'bg-[var(--accent)] text-[var(--text-primary)]' : 'bg-[var(--bg-elevated)] text-[var(--text-muted)]'}`}>
+                    <UploadCloud className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[var(--text-primary)] mb-1">
+                      点击上传或拖拽文件到此处
+                    </p>
+                    <p className="text-xs text-[var(--text-tertiary)]">
+                      支持导入 .docx, .doc, .txt, .md 格式的剧本文档
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           {/* Season Management Section */}
           <div className="mb-8 flex items-center justify-between">
