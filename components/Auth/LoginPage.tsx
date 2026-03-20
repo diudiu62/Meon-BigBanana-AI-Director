@@ -4,14 +4,16 @@
  */
 
 import React, { useState } from 'react';
-import { Loader2, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Eye, EyeOff, AlertCircle, X, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import logoImg from '../../meon_logo.svg';
 
 type AuthMode = 'login' | 'register';
 
 const LoginPage: React.FC = () => {
   const { signIn, signUp } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -64,36 +66,46 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        {/* Logo & Title */}
-        <div className="text-center mb-10">
-          <img src={logoImg} alt="Logo" className="w-16 h-16 mx-auto mb-4" />
-          <h1 className="text-2xl font-light text-[var(--text-primary)] tracking-tight mb-1">
-            Meon
-          </h1>
-          <p className="text-xs text-[var(--text-muted)] font-mono uppercase tracking-widest">
-            {mode === 'login' ? 'Sign In' : 'Create Account'}
-          </p>
-        </div>
+    <div className={`min-h-screen bg-[var(--bg-base)] flex items-center justify-center p-6 font-sans transition-colors duration-500 ${theme === 'dark' ? 'dark' : ''}`}>
+      
+      {/* Theme Toggle Button (Optional, can be removed if handled globally) */}
+      <button 
+        onClick={toggleTheme} 
+        className="fixed top-6 left-6 p-3 bg-[var(--bg-primary)] shadow-lg rounded-full text-[var(--text-secondary)] hover:scale-110 transition-all z-50 border border-[var(--border-primary)]" 
+        title="切换深浅模式" 
+      > 
+        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />} 
+      </button>
 
+      <div className="w-full max-w-[440px]">
         {/* Form Card */}
-        <div className="bg-[var(--bg-primary)] border border-[var(--border-primary)] p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="bg-[var(--bg-primary)] rounded-[32px] shadow-2xl relative overflow-hidden flex flex-col p-8 sm:p-10 transition-all duration-300 border border-[var(--border-primary)]">
+          
+          {/* Logo & Title */}
+          <div className="text-left mb-10 mt-4">
+            <h1 className="text-3xl font-light text-[var(--text-primary)] tracking-tight mb-1">
+              Meon
+            </h1>
+            <p className="text-[10px] text-[var(--text-muted)] font-mono uppercase tracking-widest">
+              {mode === 'login' ? 'Sign In' : 'Create Account'}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Display Name (register only) */}
             {mode === 'register' && (
               <div>
-                <label className="block text-[10px] text-[var(--text-tertiary)] font-mono uppercase tracking-widest mb-2">
+                <label className="block text-[10px] text-[var(--text-muted)] font-mono uppercase tracking-widest mb-2 px-1">
                   昵称（可选）
                 </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
+                <div className="group flex items-center bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] border border-transparent focus-within:border-[var(--border-secondary)] rounded-full px-5 h-[50px] transition-all duration-200">
+                  <User className="mr-3 text-[var(--text-muted)] w-[18px] h-[18px]" />
                   <input
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     placeholder="输入昵称"
-                    className="w-full pl-10 pr-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-text)] transition-colors"
+                    className="flex-1 bg-transparent outline-none text-[var(--text-primary)] placeholder-[var(--text-muted)] text-[15px] font-medium caret-[var(--accent)]"
                   />
                 </div>
               </div>
@@ -101,29 +113,29 @@ const LoginPage: React.FC = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-[10px] text-[var(--text-tertiary)] font-mono uppercase tracking-widest mb-2">
+              <label className="block text-[10px] text-[var(--text-muted)] font-mono uppercase tracking-widest mb-2 px-1">
                 邮箱
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
+              <div className="group flex items-center bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] border border-transparent focus-within:border-[var(--border-secondary)] rounded-full px-5 h-[50px] transition-all duration-200">
+                <Mail className="mr-3 text-[var(--text-muted)] w-[18px] h-[18px]" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-text)] transition-colors"
+                  className="flex-1 bg-transparent outline-none text-[var(--text-primary)] placeholder-[var(--text-muted)] text-[15px] font-medium caret-[var(--accent)]"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-[10px] text-[var(--text-tertiary)] font-mono uppercase tracking-widest mb-2">
+              <label className="block text-[10px] text-[var(--text-muted)] font-mono uppercase tracking-widest mb-2 px-1">
                 密码
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
+              <div className="flex items-center bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] border border-transparent focus-within:border-[var(--border-secondary)] rounded-full px-5 h-[50px] transition-all duration-200">
+                <Lock className="mr-3 text-[var(--text-muted)] w-[18px] h-[18px]" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -131,21 +143,21 @@ const LoginPage: React.FC = () => {
                   placeholder={mode === 'register' ? '至少 6 位' : '输入密码'}
                   required
                   minLength={mode === 'register' ? 6 : undefined}
-                  className="w-full pl-10 pr-12 py-3 bg-[var(--bg-surface)] border border-[var(--border-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-text)] transition-colors"
+                  className="flex-1 bg-transparent outline-none text-[var(--text-primary)] placeholder-[var(--text-muted)] text-[15px] font-medium caret-[var(--accent)]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--text-muted)] hover:text-[var(--text-tertiary)] transition-colors"
+                  className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] p-1 ml-2 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="flex items-start gap-2 p-3 bg-[var(--error-hover-bg)] border border-[var(--error-border)] text-[var(--error-text)] text-xs">
+              <div className="flex items-start gap-2 p-3 bg-[var(--error-hover-bg)] border border-[var(--error-border)] text-[var(--error-text)] text-xs rounded-lg">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
@@ -153,7 +165,7 @@ const LoginPage: React.FC = () => {
 
             {/* Success Message */}
             {successMessage && (
-              <div className="flex items-start gap-2 p-3 bg-[var(--success)]/10 border border-[var(--success)]/30 text-[var(--success)] text-xs">
+              <div className="flex items-start gap-2 p-3 bg-[var(--success-bg)] border border-[var(--success-border)] text-[var(--success-text)] text-xs rounded-lg">
                 <span>{successMessage}</span>
               </div>
             )}
@@ -162,7 +174,7 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest"
+              className="w-full bg-[var(--text-primary)] hover:bg-[var(--text-secondary)] text-[var(--bg-primary)] font-bold uppercase tracking-widest h-[50px] rounded-full text-[14px] transition-all shadow-md active:scale-[0.98] mt-4 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -173,22 +185,23 @@ const LoginPage: React.FC = () => {
                 mode === 'login' ? '登录' : '注册'
               )}
             </button>
+
+            {/* Toggle Mode Link */}
+            <div className="mt-6 text-left px-1">
+              <button
+                type="button"
+                onClick={toggleMode}
+                className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+              >
+                {mode === 'login' ? '没有账户？点击注册' : '已有账户？点击登录'}
+              </button>
+            </div>
           </form>
 
-          {/* Toggle Mode */}
-          <div className="mt-6 text-center">
-            <button
-              onClick={toggleMode}
-              className="text-xs text-[var(--text-tertiary)] hover:text-[var(--accent-text)] transition-colors"
-            >
-              {mode === 'login' ? '没有账户？点击注册' : '已有账户？点击登录'}
-            </button>
+          {/* Footer */}
+          <div className="mt-10 text-left px-1 text-[9px] text-[var(--text-muted)] font-mono uppercase tracking-widest">
+            Meon © {new Date().getFullYear()}
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-6 text-center text-[9px] text-[var(--text-muted)] font-mono uppercase tracking-widest">
-          Meon &copy; {new Date().getFullYear()}
         </div>
       </div>
     </div>
